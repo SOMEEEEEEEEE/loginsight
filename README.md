@@ -10,10 +10,10 @@ A production-style log analysis service that detects error patterns and anomalie
 
 ## Architecture
 Client → API → Analyzer → Result
-         ↓
-      Docker
-         ↓
-        *EC2
+	↓
+	Docker
+	↓
+	*EC2
 
 ## *CI/CD
 - Push to main → GitHub Actions → Build Docker → Deploy to EC2
