@@ -9,11 +9,13 @@ A production-style log analysis service that detects error patterns and anomalie
 - Anomaly detection
 
 ## Architecture
-Client → API → Analyzer → Result
-	↓
-	Docker
-	↓
-	*EC2
+
+ 	Client → API → Analyzer → Result
+ 		↓
+ 		Docker
+		↓
+ 		*EC2
+
 
 ## *CI/CD
 - Push to main → GitHub Actions → Build Docker → Deploy to EC2
