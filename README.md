@@ -13,12 +13,14 @@ A production-style log analysis service that detects error patterns and anomalie
  	Client → API → Analyzer → Result
  		↓
  		Docker
-		↓
- 		*EC2
+ 		↓
+ 		Docker Hub
+ 		↓
+ 		*EC2 (pull image)
 
 
 ## *CI/CD
-- Push to main → GitHub Actions → Build Docker → Deploy to EC2
+- Push to main → GitHub Actions → Build Docker → Push to Docker Hub → *Deploy to EC2 (Pull Image)
 
 ## *Example
 curl -X POST http://<EC2-IP>/analyze \
