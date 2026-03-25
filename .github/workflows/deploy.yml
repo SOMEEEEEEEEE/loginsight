@@ -35,4 +35,13 @@ jobs:
 
     # Deploy to EC2 via SSH
     - name: Deploy to EC2
-      run: echo "Deploy step placeholder"
+      uses: appleboy/ssh-action@v1.2.5
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_KEY }}
+        script: |
+          docker pull ${{ secrets.DOCKER_USERNAME }}/log-insight:latest
+          docker stop log-insight || true
+          docker rm log-insight || true
+          docker run -d -p 80:8000 --name log-insight ${{ secrets.DOCKER_USERNAME }}/log-insight:latest
