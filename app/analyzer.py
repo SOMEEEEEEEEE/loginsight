@@ -1,14 +1,16 @@
 from collections import Counter
 import re
 
+TOP_ERROR = 3
+
 def analyze_logs(logs):
     # Filter out logs
     error_logs = [log for log in logs if "ERROR" in log]
     patterns = [extract_pattern(log) for log in error_logs]
     counter = Counter(patterns)
 
-    # Simple error analyses
-    top_errors = [p for p, _ in counter.most_common(3)]
+    # Simple error analyses -> return top TOP_ERROR errors
+    top_errors = [p for p, _ in counter.most_common(TOP_ERROR)]
     error_rate = len(error_logs) / len(logs) if logs else 0
     # Use error rate as a simple anomaly score
     anomaly_score = round(error_rate, 2)
@@ -20,7 +22,11 @@ def analyze_logs(logs):
         "anomaly_score": anomaly_score
     }
 
-# Function to clean and extract pattern from a log line
+# Function to clean and extract pattern from one log line
 def extract_pattern(log):
-    # Remove numbers & "ERROR", strip spaces
-    return re.sub(r'\d+', '', log).replace("ERROR", "").strip()
+    # Extract only error info
+    match = re.search(r"ERROR[:\s]*(.*)", log)
+    if match:
+        return match.group(1).strip()
+    # Fallback, return origin log
+    return log
