@@ -1,20 +1,27 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from app.analyzer import analyze_logs
+from typing import Optional
+
+class StructuredLog(BaseModel):
+    timestamp: str
+    level: str
+    message: str
+    service: Optional[str] = None
 
 app = FastAPI()
 
 logs_storage = []
 
 class LogRequest(BaseModel):
-    logs: list[str]
+    logs: list[StructuredLog]
 
 # Health check
 @app.get("/")
 def health():
     return {"status": "LogInsight running"}
 
-# Ingest logs: save uploaded logs and returns status
+# Ingest logs: saves uploaded structured logs and returns status
 @app.post("/ingest")
 def ingest(req: LogRequest):
     logs_storage.extend(req.logs)
