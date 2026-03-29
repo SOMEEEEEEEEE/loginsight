@@ -20,18 +20,13 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    # Debug Docker Hub login
-    - name: Debug Docker username
-      run: |
-        echo "Docker user = ${{ secrets.DOCKER_USERNAME }}"
-        echo "Length = ${{ secrets.DOCKER_USERNAME }}"
-        echo "Length = ${{ secrets.DOCKER_USERNAME }}"
 
     # Build and push docker image
     - name: Build and Push
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/log-insight:latest .
-        docker push ${{ secrets.DOCKER_USERNAME }}/log-insight:latest
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/log-insight:${{ github.sha }} .
+        docker push ${{ secrets.DOCKER_USERNAME }}/log-insight:${{ github.sha }}
+
 
     # Deploy to EC2 via SSH
     - name: Deploy to EC2
@@ -41,7 +36,7 @@ jobs:
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          docker pull ${{ secrets.DOCKER_USERNAME }}/log-insight:latest
+          docker pull ${{ secrets.DOCKER_USERNAME }}/log-insight:${{ github.sha }}
           docker stop log-insight || true
           docker rm log-insight || true
-          docker run -d -p 80:8000 --name log-insight ${{ secrets.DOCKER_USERNAME }}/log-insight:latest
+          docker run -d -p 80:8000 --name log-insight ${{ secrets.DOCKER_USERNAME }}/log-insight:${{ github.sha }}
