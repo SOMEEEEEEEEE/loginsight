@@ -20,19 +20,21 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-
-    # Build and push docker image
+    # Build and push Docker image
     - name: Build and Push
       run: |
         docker build -t ${{ secrets.DOCKER_USERNAME }}/log-insight:${{ github.sha }} .
         docker push ${{ secrets.DOCKER_USERNAME }}/log-insight:${{ github.sha }}
 
+    # Debug environment variables
     - name: Debug env
       run: |
-        docker run --rm -e S3_BUCKET=${{ secrets.S3_BUCKET }} -e AWS_REGION=${{ secrets.AWS_REGION }} alpine env | grep -E 'S3_BUCKET|AWS_REGION'
+        docker run --rm \
+          -e S3_BUCKET=${{ secrets.S3_BUCKET }} \
+          -e AWS_REGION=${{ secrets.AWS_REGION }} \
+          alpine env | grep -E 'S3_BUCKET|AWS_REGION'
 
-
-    # Deploy to EC2 via SSH
+    # Deploy to EC2 via SSH using docker-compose
     - name: Deploy to EC2
       uses: appleboy/ssh-action@v1.2.5
       with:
@@ -40,7 +42,24 @@ jobs:
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
+          # Ensure project folder exists
+          if [ ! -d ~/log-insight ]; then
+            git clone https://github.com/${{ secrets.REPO_NAME }}.git ~/log-insight
+          fi
+
+          # Navigate to project folder
+          cd ~/log-insight
+
+          # Pull the latest Docker image
           docker pull ${{ secrets.DOCKER_USERNAME }}/log-insight:${{ github.sha }}
-          docker stop log-insight || true
-          docker rm log-insight || true
-          docker run -d -p 80:8000 -e S3_BUCKET=${{ secrets.S3_BUCKET }} -e AWS_REGION=${{ secrets.AWS_REGION }} --name log-insight ${{ secrets.DOCKER_USERNAME }}/log-insight:${{ github.sha }}
+
+          # Create/update .env file for docker-compose (in current directory)
+          echo "IMAGE=${{ secrets.DOCKER_USERNAME }}/log-insight:${{ github.sha }}" > .env
+          echo "S3_BUCKET=${{ secrets.S3_BUCKET }}" >> .env
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
+
+          # Stop old containers and remove orphans
+          docker-compose down --remove-orphans
+
+          # Start up new containers
+          docker-compose up -d

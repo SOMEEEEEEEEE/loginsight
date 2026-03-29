@@ -4,8 +4,8 @@ services:
   log-insight:
     build: .
     container_name: log-insight
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     environment:
       - AWS_REGION=${AWS_REGION}
       - S3_BUCKET=${S3_BUCKET}
