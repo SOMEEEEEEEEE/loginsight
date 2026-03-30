@@ -1,90 +1,157 @@
 # LogInsight
 
 ## Overview
-A production-style log analysis service that detects error patterns and anomalies from operational logs, with automated CI/CD and cloud deployment.
+LogInsight is a cloud-native log processing pipeline designed to detect error patterns and anomalies from operational logs.
+
+The system follows a scalable, production-style architecture with decoupled ingestion, containerized deployment, and cloud storage integration.
+
+---
+
+## Project Goals
+
+This project is designed to demonstrate:
+
+- Cloud-native system design
+- Distributed log processing architecture
+- Scalable and resilient services
+- CI/CD and DevOps practices
+
+---
 
 ## Features
-- Log pattern extraction
-- Error aggregation & Anomaly detection
-- Cloud-ready: easily deployable on AWS EC2 or other cloud VMs
-- Dockerized for scalable deployments
+- Log pattern extraction & error aggregation
+- Anomaly detection (lightweight statistical approach)
+- Scalable multi-instance deployment with Nginx load balancing
+- Cloud storage integration (AWS S3)
+- Containerized with Docker
+- Automated CI/CD pipeline (GitHub Actions → Docker Hub → EC2)
+
+---
 
 ## Architecture
 
- 	Client → API → Analyzer → Result
- 		↓
- 		Docker
- 		↓
- 		Docker Hub
- 		↓
- 		EC2 (pull image)
+### Current (Deployed)
 
+Client → Nginx (Load Balancer) → FastAPI (Multi-instance)
+                                  ↓
+                                Analyzer
+                                  ↓
+                                 S3
+
+---
+
+### Target Cloud Architecture (In Progress)
+
+Client
+  ↓
+API Gateway
+  ↓
+Ingestion Layer (Lambda / API)
+  ↓
+Queue (SQS)
+  ↓
+Worker (Auto Scaling)
+  ↓
+S3 (Raw / Processed Logs)
+  ↓
+Monitoring (CloudWatch)
+
+---
+
+## Key Concepts
+
+- **Load Balancing**: Nginx distributes traffic across multiple FastAPI instances
+- **Scalability**: Services can be horizontally scaled via Docker Compose or cloud auto scaling
+- **Decoupling (planned)**: Queue-based ingestion using SQS
+- **Durable Storage**: Logs stored in AWS S3
+- **Cloud-ready**: Designed for migration to AWS managed services
+
+---
 
 ## CI/CD
-- Push to main → GitHub Actions → Build Docker → Push to Docker Hub → Deploy to EC2
 
-## Example
+Pipeline:
 
-### Health check: 
+Push to main  
+→ GitHub Actions  
+→ Build Docker Image  
+→ Push to Docker Hub  
+→ Deploy to EC2  
+→ Restart services with scaling  
+
+---
+
+## API Usage
+
+### Health Check
 
 ```bash
-curl http://localhost/
+curl http://<EC2-IP>/health
 ```
 
-or 
+### Ingest Logs
 
 ```bash
-curl http://<EC2-IP>/
+curl -X POST http://<EC2-IP>/ingest \
+  -H "Content-Type: application/json" \
+  -d '{
+    "logs": [
+      {"timestamp": "2026-03-30T10:00:00", "level": "ERROR", "message": "DB timeout", "service": "auth"}
+    ]
+  }'
 ```
 
-### Send logs for analysis:
+### Analyze Logs
 
 ```bash
-curl -X POST http://localhost:80/ingest \
-     -H "Content-Type: application/json" \
-     -d '{"log": "ERROR Something went wrong"}'
-```
-
-Return: 
-
-```bash
-{"msg":"3 logs ingested","total_logs":3}
-```
-
-### Get the results: 
-
-```bash
-curl http://localhost:80/analyze
+curl http://<EC2-IP>/analyze
 ```
 
 Return: 
 
 ```bash
 {
-	"error_count":2,
-	"top_errors":[
-		"Failed to connect to DB",
-		"DB timeout"
-	],
-	"anomaly_score":0.67
+  "error_count": 2,
+  "top_errors": [
+    "Failed to connect to DB",
+    "DB timeout"
+  ],
+  "anomaly_score": 0.67
 }
 ```
 
-### Reset stored logs: 
+### Reset Logs
 
 ```bash
-curl -X POST http://localhost:80/reset
+curl -X POST http://<EC2-IP>/reset
 ```
+---
 
-## Run locally: 
+## Multi-instance Deployment (with Nginx)
+
+Start services with scaling:
 
 ```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+docker-compose up -d --scale log-insight=3
 ```
 
-## Docker
+---
+
+## AWS S3 Integration
+
+Environment variables:
 
 ```bash
-docker build -t log-insight .
-docker run -d -p 8000:8000 log-insight
+AWS_REGION=<your-region>
+S3_BUCKET=<your-bucket>
 ```
+
+Logs are automatically uploaded to S3 for persistent storage.
+
+---
+
+## Summary
+
+LogInsight evolves from a simple log analysis API into a cloud-ready observability pipeline, focusing on scalability, decoupling, and production-grade architecture.
+
+---
