@@ -23,8 +23,8 @@ jobs:
     # Build and push Docker image
     - name: Build and Push
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/log-insight:${{ github.sha }} .
-        docker push ${{ secrets.DOCKER_USERNAME }}/log-insight:${{ github.sha }}
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/log-insight-duplica:${{ github.sha }} .
+        docker push ${{ secrets.DOCKER_USERNAME }}/log-insight-duplica:${{ github.sha }}
 
     # Debug environment variables
     - name: Debug env
@@ -51,7 +51,7 @@ jobs:
           cd ~/log-insight
 
           # Pull the latest Docker image
-          docker pull ${{ secrets.DOCKER_USERNAME }}/log-insight:${{ github.sha }}
+          docker pull ${{ secrets.DOCKER_USERNAME }}/log-insight-duplica:${{ github.sha }}
 
           # Create/update .env file for docker-compose (in current directory)
           echo "IMAGE=${{ secrets.DOCKER_USERNAME }}/log-insight:${{ github.sha }}" > .env
@@ -62,4 +62,4 @@ jobs:
           docker-compose down --remove-orphans
 
           # Start up new containers
-          docker-compose up -d
+          docker-compose up -d  --scale log-insight=2

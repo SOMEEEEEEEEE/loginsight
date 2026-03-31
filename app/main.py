@@ -5,6 +5,8 @@ from app.s3_client import upload_log, get_all_logs, delete_all_logs
 from typing import Optional
 import json
 
+import socket
+
 
 app = FastAPI()
 
@@ -25,7 +27,7 @@ class LogRequest(BaseModel):
 # Health check
 @app.get("/")
 def health():
-    return {"status": "LogInsight running"}
+    return {"status": "LogInsight Running", "instance": socket.gethostname()}
 
 
 # Ingest logs: saves uploaded structured logs into S3 bucket and returns status
