@@ -1,14 +1,23 @@
-version: '3.9'
+version: "3.9"
 
 services:
-  log-insight:
-    image: ${IMAGE}
-    expose:
-      - "8000"
-    environment:
-      - AWS_REGION=${AWS_REGION}
-      - S3_BUCKET=${S3_BUCKET}
-    restart: always
+  api:
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile
+    container_name: loginsight-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+
+  worker:
+    build:
+      context: .
+      dockerfile:  ./worker/Dockerfile
+    container_name: loginsight-worker
+    env_file:
+      - .env
 
   nginx:
     image: nginx:latest
@@ -17,7 +26,5 @@ services:
       - "80:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./logs:/var/log/nginx
     depends_on:
-      - log-insight
-    restart: always
+      - api
