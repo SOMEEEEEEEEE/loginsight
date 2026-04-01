@@ -54,7 +54,7 @@ jobs:
           docker pull ${{ secrets.DOCKER_USERNAME }}/log-insight-duplica:${{ github.sha }}
 
           # Create/update .env file for docker-compose (in current directory)
-          echo "IMAGE=${{ secrets.DOCKER_USERNAME }}/log-insight:${{ github.sha }}" > .env
+          echo "IMAGE=${{ secrets.DOCKER_USERNAME }}/log-insight-duplica:${{ github.sha }}" > .env
           echo "S3_BUCKET=${{ secrets.S3_BUCKET }}" >> .env
           echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
 
