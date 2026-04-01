@@ -1,7 +1,12 @@
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 from fastapi import FastAPI
 from pydantic import BaseModel
-from app.analyzer import analyze_logs
-from app.s3_client import upload_log, get_all_logs, delete_all_logs
+from common.analyzer import analyze_logs
+from common.s3_client import upload_log, get_all_logs, delete_all_logs
 from typing import Optional
 import json
 
