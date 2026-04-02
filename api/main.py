@@ -1,71 +1,40 @@
-import sys
-from pathlib import Path
-
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-
-from fastapi import FastAPI
-from pydantic import BaseModel
-from common.analyzer import analyze_logs
-from common.s3_client import upload_log, get_all_logs, delete_all_logs
-from typing import Optional
-import json
-
 import socket
+from fastapi import FastAPI
 
+from api.sqs_client import send_message
+from api.models import LogRequest, StructuredLog
 
 app = FastAPI()
 
 
-class StructuredLog(BaseModel):
-    timestamp: str
-    level: str
-    message: str
-    service: Optional[str] = None
-
-
-class LogRequest(BaseModel):
-    logs: list[StructuredLog]
-
-
-
-
-# Health check
+# ----------------------------
+# Health Check
+# ----------------------------
 @app.get("/")
 def health():
-    return {"status": "LogInsight Running", "instance": socket.gethostname()}
-
-
-# Ingest logs: saves uploaded structured logs into S3 bucket and returns status
-@app.post("/ingest")
-def ingest(req: LogRequest):
-    keys = []
-
-    for log in req.logs:
-        key = upload_log(log.json())  # converted to JSON str
-        keys.append(key)
-
     return {
-        "msg": f"{len(req.logs)} logs ingested",
-        "s3_keys": keys
+        "status": "LogInsight Running",
+        "instance": socket.gethostname()
     }
 
 
-# Analyze logs: receives logs and returns analysis
-@app.get("/analyze")
-def analyze():
-    raw_logs = get_all_logs()
+# ----------------------------
+# Ingest Logs (Async via SQS)
+# ----------------------------
+@app.post("/logs")
+def ingest_logs(req: LogRequest):
+    """
+    Receives logs and pushes them to SQS.
+    Does NOT process or store logs directly.
+    """
 
-    if not raw_logs:
-        return {"msg": "No logs in S3"}
+    # Convert to dict for json serializing
+    logs_payload = [log.dict() for log in req.logs]
 
-    logs = [StructuredLog(**json.loads(log)) for log in raw_logs]
+    # Send to SQS
+    send_message(logs_payload)
 
-    result = analyze_logs(logs)
-    return result
-
-
-# Reset logs: clears all historical logs when necessary
-@app.post("/reset")
-def reset():
-    delete_all_logs()
-    return {"msg": "All logs deleted from S3"}
+    return {
+        "status": "queued",
+        "count": len(logs_payload)
+    }
