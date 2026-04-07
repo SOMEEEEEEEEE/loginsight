@@ -32,7 +32,7 @@ def process_logs(data: dict):
     }
 
     key = f"results/{task_id}.json"
-    upload_with_key(key, result_payload)
+    result_key = upload_with_key(key, result_payload)
 
     # result_key = upload_data(result_payload)
     print(f"[Processor] Result stored at: {result_key}")
