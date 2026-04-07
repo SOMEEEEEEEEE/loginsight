@@ -24,12 +24,14 @@ def handle_message(msg):
 
     except Exception as e:
         print(f"[ERROR] Processing failed: {e}")
+        print("[ERROR] Raw message:", msg["Body"])
 
 
 def poll():
     """
     Continuously poll messages from SQS.
     """
+    print("[Worker] polling started...")
     while True:
         try:
             messages = receive_messages(max_number=5)
@@ -47,4 +49,5 @@ def poll():
 
 
 if __name__ == "__main__":
+    print("worker booting...")
     poll()
