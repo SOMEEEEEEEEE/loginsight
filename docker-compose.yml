@@ -1,23 +1,35 @@
 version: "3.9"
 
 services:
-  api:
+  ingest:
     build:
       context: .
-      dockerfile: ./api/Dockerfile
-    container_name: loginsight-api
-    ports:
-      - "8000:8000"
+      dockerfile: ingest/Dockerfile
+    container_name: loginsight-ingest
     env_file:
       - .env
+    ports:
+      - "8001:8000"
+
+  query:
+    build:
+      context: .
+      dockerfile: query/Dockerfile
+    container_name: loginsight-query
+    env_file:
+      - .env
+    ports:
+      - "8002:8000"
 
   worker:
     build:
       context: .
-      dockerfile:  ./worker/Dockerfile
+      dockerfile: worker/Dockerfile
     container_name: loginsight-worker
     env_file:
       - .env
+    depends_on:
+      - ingest
 
   nginx:
     image: nginx:latest
@@ -27,4 +39,5 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - api
+      - ingest
+      - query
