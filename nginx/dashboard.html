@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>LogInsight Dashboard</title>
+<style>
+body { font-family: Arial; padding: 40px }
+.card { padding:20px; margin:10px; border:1px solid #ccc }
+.ok { color:green }
+.fail { color:red }
+</style>
+</head>
+
+<body>
+
+<h1>LogInsight Dashboard</h1>
+
+<div class="card">Ingest: <span id="ingest">checking...</span></div>
+<div class="card">Query: <span id="query">checking...</span></div>
+
+<script>
+
+async function check(service, path) {
+    try {
+        const res = await fetch(path)
+        const data = await res.json()
+
+        document.getElementById(service).innerHTML =
+            "<span class='ok'>OK</span>"
+    } catch {
+        document.getElementById(service).innerHTML =
+            "<span class='fail'>DOWN</span>"
+    }
+}
+
+function refresh(){
+    check("ingest", "/ingest")
+    check("query", "/query")
+}
+
+setInterval(refresh, 2000)
+refresh()
+
+</script>
+
+</body>
+</html>
