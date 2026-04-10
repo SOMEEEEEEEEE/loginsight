@@ -8,4 +8,4 @@ def get_result(task_id: str):
     result = get_data(key)
     if result is None:
         return {"task_id": task_id, "status": "processing"}
-    return {"task_id": task_id, "status": "completed", "result": result}
+    return {"task_id": task_id, "status": "completed", **result}

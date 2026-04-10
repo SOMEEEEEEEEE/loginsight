@@ -25,5 +25,5 @@ def enqueue_logs(logs: list):
         "task_id": task_id,
         "message_id": msg_id,
         "count": len(logs_payload),
-        "query_hint": f"/results?task_id={task_id}"
+        "query_hint": f"/results/task_id={task_id}"
     }
