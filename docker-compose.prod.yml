@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+
+  ingest:
+    image: ${DOCKER_USERNAME}/loginsight-ingest:latest
+    container_name: loginsight-ingest
+    restart: unless-stopped
+    env_file:
+      - .env
+    networks:
+      - loginsight-net
+
+  query:
+    image: ${DOCKER_USERNAME}/loginsight-query:latest
+    container_name: loginsight-query
+    restart: unless-stopped
+    env_file:
+      - .env
+    networks:
+      - loginsight-net
+
+  worker:
+    image: ${DOCKER_USERNAME}/loginsight-worker:latest
+    container_name: loginsight-worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    networks:
+      - loginsight-net
+
+  nginx:
+    image: ${DOCKER_USERNAME}/loginsight-nginx:latest
+    container_name: loginsight-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - ingest
+      - query
+    networks:
+      - loginsight-net
+
+networks:
+  loginsight-net:
+    driver: bridge
