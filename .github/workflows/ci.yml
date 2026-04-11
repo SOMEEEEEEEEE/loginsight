@@ -1,4 +1,4 @@
-name: Build & Push DockerHub
+name: Build & Push to DockerHub
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - cloud-native
 
 jobs:
-  deploy:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,3 +33,8 @@ jobs:
       run: |
         docker build -t ${{ secrets.DOCKER_USERNAME }}/loginsight-worker:latest -f worker/Dockerfile .
         docker push ${{ secrets.DOCKER_USERNAME }}/loginsight-worker:latest
+
+    - name: Build and push nginx
+      run: |
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/loginsight-nginx:latest -f nginx/Dockerfile .
+        docker push ${{ secrets.DOCKER_USERNAME }}/loginsight-nginx:latest
