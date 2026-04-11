@@ -2,7 +2,7 @@ name: Deploy to EC2
 
 on:
   workflow_run:
-    workflows: ["CI"]
+    workflows: ["Build & Push to DockerHub"]
     types:
       - completed
 
