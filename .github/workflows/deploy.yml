@@ -21,15 +21,15 @@ jobs:
 
     - name: Build and push ingest
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/loginsight-ingest:latest ./ingest
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/loginsight-ingest:latest -f ingest/Dockerfile .
         docker push ${{ secrets.DOCKER_USERNAME }}/loginsight-ingest:latest
 
     - name: Build and push query
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/loginsight-query:latest ./query
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/loginsight-query:latest -f query/Dockerfile .
         docker push ${{ secrets.DOCKER_USERNAME }}/loginsight-query:latest
 
     - name: Build and push worker
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/loginsight-worker:latest ./worker
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/loginsight-worker:latest -f worker/Dockerfile .
         docker push ${{ secrets.DOCKER_USERNAME }}/loginsight-worker:latest
