@@ -6,7 +6,7 @@ on:
       - cloud-native
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -38,3 +38,29 @@ jobs:
       run: |
         docker build -t ${{ secrets.DOCKER_USERNAME }}/loginsight-nginx:latest -f nginx/Dockerfile .
         docker push ${{ secrets.DOCKER_USERNAME }}/loginsight-nginx:latest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+
+          script: |
+            set -e
+
+            echo "Starting deployment..."
+
+            export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+
+            cd ~/cloud-native
+
+            docker-compose pull
+            docker-compose up -d --remove-orphans
+
+            echo "Deployment success"
