@@ -254,6 +254,43 @@ All workers consume from same SQS queue.
 
 ---
 
+## Platform Evolution Roadmap
+This project is evolving from a minimal async log pipeline into a cloud-native DevOps platform.
+
+### Phase 1 — Containerized Microservices (Completed)
+* Split ingest / query / worker services
+* Introduce shared common module
+* Async processing via SQS
+* S3-based result storage
+* Nginx reverse proxy
+Phase 2 — Cloud-Native Deployment (In Progress)
+* Docker Compose multi-service deployment
+* Environment-based configuration (.env)
+* Service health checks
+* Production-ready container images
+Phase 3 — Kubernetes Platform
+* Kubernetes deployment manifests
+* Service & ingress configuration
+* Horizontal worker scaling
+* ConfigMap & Secrets support
+Phase 4 — Infrastructure as Code
+* Terraform infrastructure definition
+* Cloud resource provisioning
+* Environment separation (dev/staging/prod)
+* Automated deployment workflows
+Phase 5 — CI/CD & DevOps Enablement
+* GitHub Actions CI pipeline
+* Container image build & publish
+* Kubernetes deployment automation
+* Release versioning
+Phase 6 — Observability & Reliability
+* Structured logging
+* Metrics collection
+* Health checks & readiness probes
+* Failure retry & DLQ support
+
+---
+
 ## Tech Stack
 
 * FastAPI
