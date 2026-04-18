@@ -1,50 +1,77 @@
-name: Build & Push to DockerHub
+name: CI/CD - Build, Scan, Push, Deploy
 
 on:
   push:
     branches:
       - cloud-native
 
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  IMAGE_TAG: ${{ github.sha }}
+
 jobs:
-  build:
+
+  # =========================
+  # CI STAGE
+  # =========================
+  ci:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service: [ingest, query, worker, nginx]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # -------------------------
+      # Build image (local)
+      # -------------------------
+      - name: Build ${{ matrix.service }}
+        run: |
+          docker build \
+            -t $DOCKER_USERNAME/loginsight-${{ matrix.service }}:$IMAGE_TAG \
+            -f ${{ matrix.service }}/Dockerfile .
+
+      # -------------------------
+      # FIXED: Trivy scan (local image, no docker.sock dependency)
+      # -------------------------
+      - name: Scan ${{ matrix.service }} image (Trivy)
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy image \
+            --severity HIGH,CRITICAL \
+            --exit-code 1 \
+            $DOCKER_USERNAME/loginsight-${{ matrix.service }}:$IMAGE_TAG
+
+      # -------------------------
+      # Docker Hub login
+      # -------------------------
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # -------------------------
+      # Push image
+      # -------------------------
+      - name: Push ${{ matrix.service }} image
+        run: |
+          docker push $DOCKER_USERNAME/loginsight-${{ matrix.service }}:$IMAGE_TAG
+
+
+  # =========================
+  # CD STAGE
+  # =========================
+  cd:
+    needs: ci
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Login to Docker Hub
-      uses: docker/login-action@v4
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - name: Build and push ingest
-      run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/loginsight-ingest:latest -f ingest/Dockerfile .
-        docker push ${{ secrets.DOCKER_USERNAME }}/loginsight-ingest:latest
-
-    - name: Build and push query
-      run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/loginsight-query:latest -f query/Dockerfile .
-        docker push ${{ secrets.DOCKER_USERNAME }}/loginsight-query:latest
-
-    - name: Build and push worker
-      run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/loginsight-worker:latest -f worker/Dockerfile .
-        docker push ${{ secrets.DOCKER_USERNAME }}/loginsight-worker:latest
-
-    - name: Build and push nginx
-      run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/loginsight-nginx:latest -f nginx/Dockerfile .
-        docker push ${{ secrets.DOCKER_USERNAME }}/loginsight-nginx:latest
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Deploy via SSH
+      - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -54,13 +81,14 @@ jobs:
           script: |
             set -e
 
-            echo "Starting deployment..."
-
-            export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+            echo "Deploying LogInsight..."
 
             cd ~/cloud-native
+
+            export IMAGE_TAG=${{ github.sha }}
+            export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
 
             docker-compose pull
             docker-compose up -d --remove-orphans
 
-            echo "Deployment success"
+            echo "Deployment completed successfully"
