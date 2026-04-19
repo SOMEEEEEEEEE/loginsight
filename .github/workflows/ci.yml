@@ -1,0 +1,40 @@
+name: CI - Build & Push
+
+on:
+  push:
+    branches:
+      - cloud-native
+
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+
+  ci:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service: [ingest, query, worker, nginx]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build ${{ matrix.service }}
+        run: |
+          docker build \
+            -t $DOCKER_USERNAME/loginsight-${{ matrix.service }}:$IMAGE_TAG \
+            -f docker/${{ matrix.service }}.Dockerfile .
+
+
+      - name: Push ${{ matrix.service }}
+        run: |
+          docker push $DOCKER_USERNAME/loginsight-${{ matrix.service }}:$IMAGE_TAG

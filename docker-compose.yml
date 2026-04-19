@@ -5,35 +5,38 @@ services:
   ingest:
     build:
       context: .
-      dockerfile: ingest/Dockerfile
+      dockerfile: docker/ingest.Dockerfile
     container_name: loginsight-ingest
     ports:
-      - "8001:8001"
+      - "8001:8000"
     env_file:
       - .env
+    restart: always
 
   query:
     build:
       context: .
-      dockerfile: query/Dockerfile
+      dockerfile: docker/query.Dockerfile
     container_name: loginsight-query
     ports:
-      - "8002:8002"
+      - "8002:8000"
     env_file:
       - .env
+    restart: always
 
   worker:
     build:
       context: .
-      dockerfile: worker/Dockerfile
+      dockerfile: docker/worker.Dockerfile
     container_name: loginsight-worker
     env_file:
       - .env
+    restart: always
 
   nginx:
     build:
-      context: ./nginx
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: docker/nginx.Dockerfile
     container_name: loginsight-nginx
     ports:
       - "80:80"
@@ -43,3 +46,5 @@ services:
     depends_on:
       - ingest
       - query
+      - worker
+    restart: always

@@ -1,4 +1,4 @@
-from common.s3_service import get_data
+from shared.s3_service import get_data
 
 def get_result(task_id: str):
     """

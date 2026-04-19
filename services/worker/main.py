@@ -1,6 +1,6 @@
 import json
 import time
-from common.sqs_client import receive_messages, delete_message
+from shared.sqs_client import receive_messages, delete_message
 from worker.processor import process_logs
 
 
