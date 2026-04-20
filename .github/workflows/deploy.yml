@@ -59,10 +59,10 @@ jobs:
             cd ~/log-insight
 
             echo "Pull latest images..."
-            docker compose -f docker-compose.prod.yml pull
+            docker-compose -f docker-compose.prod.yml pull
 
             echo "Restart services..."
-            docker compose -f docker-compose.prod.yml up -d  --remove-orphans
+            docker-compose -f docker-compose.prod.yml up -d  --remove-orphans
 
             echo "Deployment success"
             echo "Cleanup unused images..."
