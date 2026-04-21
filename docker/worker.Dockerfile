@@ -10,6 +10,4 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 COPY shared /app/shared
 COPY services/worker /app/services/worker
 
-WORKDIR /app/services/worker
-
-CMD ["python", "-u", "main.py"]
+CMD ["python", "-u", "-m", "services.worker.main"]

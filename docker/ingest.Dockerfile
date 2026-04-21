@@ -10,6 +10,4 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 COPY shared /app/shared
 COPY services/ingest /app/services/ingest
 
-WORKDIR /app/services/ingest
-
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["uvicorn", "services.ingest.main:app", "--host", "0.0.0.0", "--port", "8000"]
