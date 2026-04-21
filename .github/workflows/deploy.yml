@@ -55,6 +55,7 @@ jobs:
             echo "Starting deployment..."
 
             export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+            export IMAGE_TAG=${{ github.sha }}
 
             cd ~/log-insight
 
