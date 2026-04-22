@@ -3,7 +3,7 @@ version: "3.9"
 services:
 
   ingest:
-    image: ${DOCKER_USERNAME}/loginsight-ingest:${{ github.sha }}
+    image: ${DOCKER_USERNAME}/loginsight-ingest:${IMAGE_TAG}
     container_name: loginsight-ingest
     restart: unless-stopped
     env_file:
@@ -12,7 +12,7 @@ services:
       - loginsight-net
 
   query:
-    image: ${DOCKER_USERNAME}/loginsight-query:${{ github.sha }}
+    image: ${DOCKER_USERNAME}/loginsight-query:${IMAGE_TAG}
     container_name: loginsight-query
     restart: unless-stopped
     env_file:
@@ -21,7 +21,7 @@ services:
       - loginsight-net
 
   worker:
-    image: ${DOCKER_USERNAME}/loginsight-worker:${{ github.sha }}
+    image: ${DOCKER_USERNAME}/loginsight-worker:${IMAGE_TAG}
     container_name: loginsight-worker
     restart: unless-stopped
     env_file:
@@ -30,7 +30,7 @@ services:
       - loginsight-net
 
   nginx:
-    image: ${DOCKER_USERNAME}/loginsight-nginx:${{ github.sha }}
+    image: ${DOCKER_USERNAME}/loginsight-nginx:${IMAGE_TAG}
     container_name: loginsight-nginx
     restart: unless-stopped
     ports:

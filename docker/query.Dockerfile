@@ -8,6 +8,6 @@ COPY services/query/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 COPY shared /app/shared
-COPY services/query /app/services/query
+COPY services/query /app/query
 
-CMD ["uvicorn", "services.query.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "query.main:app", "--host", "0.0.0.0", "--port", "8000"]
