@@ -2,7 +2,7 @@ import uuid
 import json
 from datetime import datetime
 from botocore.exceptions import ClientError
-from common.s3_client import s3, BUCKET
+from shared.s3_client import s3, BUCKET
 
 
 def upload_with_key(key: str, data: dict):
