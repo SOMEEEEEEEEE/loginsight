@@ -1,5 +1,5 @@
 import json
-from shared.sqs_client import delete_message
+from shared.aws.sqs.consumer import delete_message
 from worker.processor import process_logs
 
 

@@ -1,8 +1,7 @@
 import json
-from shared.analyzer import analyze_logs
-from shared.s3_service import upload_data, upload_with_key
-from shared.models import StructuredLog
-
+from worker.analyzer import analyze_logs
+from worker.models import StructuredLog
+from shared.aws.s3.service import upload_data, upload_with_key
 
 def process_logs(data: dict):
     """

@@ -2,7 +2,7 @@
   Control the main loop. 
 """
 import time
-from shared.sqs_client import receive_messages
+from shared.aws.sqs.consumer import receive_messages
 from worker.handler import handle_message
 
 def main():
