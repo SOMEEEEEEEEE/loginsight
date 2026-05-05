@@ -1,16 +1,17 @@
 import logging
+import json
 
-logging.basicConfig(
-    level=logging.INFO,
-    ## SAMPLE: 2026-05-03 10:00:00 [INFO] [worker] message processed
-    format="%(asctime)s [%(levelname)s] [%(service)s] %(message)s"
-)
+logging.basicConfig(level=logging.INFO)
 
 def get_logger(service):
     logger = logging.getLogger(service)
 
-    def _log(msg, level="info"):
-        extra = {"service": service}
-        getattr(logger, level)(msg, extra=extra)
+    def log(message, **kwargs):
+        payload = {
+            "service": service,
+            "message": message,
+            **kwargs
+        }
+        logger.info(json.dumps(payload))
 
-    return _log
+    return log
