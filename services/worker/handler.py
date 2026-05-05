@@ -1,6 +1,7 @@
 import json
 import time
 from worker.processor import process_logs
+
 from platform.aws.sqs.consumer import delete_message
 from platform.metrics.metrics import inc, observe_latency
 from platform.logging.logger import get_logger
@@ -28,5 +29,5 @@ def handle_message(msg):
         inc("message_failed")
         print(f"[ERROR] Failed processing message: {e}")
 
-    finally: 
+    finally:
         observe_latency("message_latency", start)
