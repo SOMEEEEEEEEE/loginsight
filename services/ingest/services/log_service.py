@@ -1,5 +1,5 @@
 import uuid
-from shared.sqs.producer import send_message
+from platform.aws.sqs.producer import send_message
 
 def enqueue_logs(logs: list):
     """

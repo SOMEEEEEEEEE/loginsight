@@ -1,6 +1,6 @@
 import json
-from shared.config.settings import settings
-from shared.aws.sqs.client import get_sqs_client
+from platform.config.settings import settings
+from platform.aws.sqs.client import get_sqs_client
 
 sqs = get_sqs_client()
 

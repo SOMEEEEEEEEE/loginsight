@@ -1,4 +1,4 @@
-from shared.s3.service import get_data
+from platform.aws.s3.service import get_data
 
 def get_result(task_id: str):
     """

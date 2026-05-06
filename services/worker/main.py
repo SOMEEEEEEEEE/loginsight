@@ -1,8 +1,8 @@
 """
-  Control the main loop. 
+  Control the main loop
 """
 import time
-from shared.aws.sqs.consumer import receive_messages
+from platform.aws.sqs.consumer import receive_messages
 from worker.handler import handle_message
 
 def main():

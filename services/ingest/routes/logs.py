@@ -1,6 +1,7 @@
 from fastapi import APIRouter
-from shared.models import LogRequest
 from ingest.services.log_service import enqueue_logs
+from platform.contracts.log_request import LogRequest
+
 
 router = APIRouter()
 

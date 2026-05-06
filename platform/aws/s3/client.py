@@ -1,7 +1,7 @@
 # shared/aws/s3/client.py
 
 import boto3
-from shared.config.settings import settings
+from platform.config.settings import settings
 
 
 s3 = boto3.client(

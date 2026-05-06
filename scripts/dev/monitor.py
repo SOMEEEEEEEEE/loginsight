@@ -1,4 +1,4 @@
-from shared.metrics import metrics
+from platform.metrics import metrics
 import time
 
 while True:

@@ -1,5 +1,5 @@
 import boto3
-from shared.config.settings import settings
+from platform.config.settings import settings
 
 
 def get_sqs_client():
