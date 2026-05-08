@@ -1,19 +1,19 @@
 import logging
 import json
-import time
+from datetime import datetime, timezone
 
 logging.basicConfig(level=logging.INFO)
 
 
-def get_logger(service):
+def get_logger(service: str):
     logger = logging.getLogger(service)
 
     def log(event, **kwargs):
         payload = {
-            "timestamp": round(time.time(), 2),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "service": service,
             "event": event,
-            **kwargs
+            "meta": kwargs
         }
 
         logger.info(json.dumps(payload))
