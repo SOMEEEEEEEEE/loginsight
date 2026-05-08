@@ -4,7 +4,7 @@ from ingest.routes import logs
 
 app = FastAPI()
 
-app.include_router(logs.router)
+app.include_router(logs.router, prefix = "/ingest")
 
 @app.get("/")
 def health():

@@ -4,7 +4,7 @@ from query.routes import results
 
 app = FastAPI()
 
-app.include_router(results.router)
+app.include_router(results.router, prefix = "/query")
 
 @app.get("/")
 def health():

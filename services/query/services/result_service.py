@@ -7,5 +7,5 @@ def get_result(task_id: str):
     key = f"results/{task_id}.json"
     result = get_data(key)
     if result is None:
-        return {"task_id": task_id, "status": "processing"}
+        return {"task_id": task_id, "status": "not_found"}
     return {"task_id": task_id, "status": "completed", **result}
