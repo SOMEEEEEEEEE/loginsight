@@ -1,5 +1,3 @@
-# shared/aws/s3/client.py
-
 import boto3
 from platform.config.settings import settings
 
