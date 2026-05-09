@@ -3,6 +3,10 @@ import time
 from worker.processor import process_logs
 from platform.aws.sqs.consumer import delete_message
 from platform.metrics.metrics import inc, observe_latency
+from platform.logging.logger import get_logger
+
+logger = get_logger("worker_handler")
+
 
 def handle_message(msg):
     start = time.time()
