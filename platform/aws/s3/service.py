@@ -5,7 +5,7 @@ from botocore.exceptions import ClientError
 
 from platform.config.settings import settings
 from platform.aws.s3.client import put_object, get_object
-from shared.logging.logger import get_logger
+from platform.logging.logger import get_logger
 
 logger = get_logger("s3_service")
 
