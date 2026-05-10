@@ -1,5 +1,3 @@
-import time
-
 """
 Current Improvements:
 - Added worker runtime logging
@@ -10,7 +8,7 @@ Next Improvements:
 - Support SQS long polling
 - Add graceful shutdown handling
 """
-
+import time
 from worker.handler import handle_message
 from platform.aws.sqs.consumer import receive_messages
 from platform.logging.logger import get_logger
