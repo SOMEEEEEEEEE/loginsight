@@ -1,46 +1,18 @@
-import json
+from datetime import datetime
 from worker.analyzer import analyze_logs
-from platform.contracts.log_request import StructuredLog
-from platform.aws.s3.service import upload_data, upload_with_key
+from worker.validator import validate_logs
+from worker.storage import save_result, save_raw
 
-def process_logs(data: dict):
-    """
-    Process a batch of logs: analyze and upload results at task level.
-    data: dict with 'task_id' and 'logs'
-    """
-    task_id = data.get("task_id")
-    logs = data.get("logs", [])
 
-    print(f"[Processor] Processing {len(logs)} logs for task_id={task_id}...")
+def process_logs(logs: list, task_id: str):
 
-    structured_logs = []
+    structured_logs = validate_logs(logs)
 
-    for log in logs:
-        try:
-            structured_logs.append(StructuredLog(**log))
-        except Exception as e:
-            print(f"[WARN] Bad log skipped: {e}")
+    inc("logs_validated")
 
-    # Batch-level analysis
     result = analyze_logs(structured_logs)
 
-    result_payload = {
-        "task_id": task_id,
-        "result": result,
-        "processed_at": "timestamp"
-    }
+    inc("analysis_done")
 
-    key = f"results/{task_id}.json"
-    result_key = upload_with_key(key, result_payload)
-
-    # result_key = upload_data(result_payload)
-    print(f"[Processor] Result stored at: {result_key}")
-
-    if structured_logs:
-        raw_payload = {
-            "task_id": task_id,
-            "logs": [log.dict() for log in structured_logs]
-        }
-
-        raw_key = upload_data(raw_payload)
-        print(f"[Processor] Raw logs stored at: {raw_key}")
+    save_result(task_id, result)
+    save_raw(task_id, structured_logs)
