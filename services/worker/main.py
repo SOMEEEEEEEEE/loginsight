@@ -3,6 +3,7 @@ Current Improvements:
 - Added worker runtime logging
 - Added polling exception protection
 - Added per-message failure isolation
+- Added configurable polling interval support
 
 Next Improvements:
 - Support SQS long polling
@@ -12,6 +13,7 @@ import time
 from worker.handler import handle_message
 from platform.aws.sqs.consumer import receive_messages
 from platform.logging.logger import get_logger
+from platform.config.settings import settings
 
 logger = get_logger("worker_main")
 
@@ -24,10 +26,13 @@ def main():
             messages = receive_messages()
 
             if not messages:
-                time.sleep(2)
+                time.sleep(settings.POLL_INTERVAL)
                 continue
 
-            logger.info(f"Received {len(messages)} messages")
+            logger.info(
+                "Received messages",
+                extra={"count": len(messages)}
+            )
 
             for msg in messages:
                 try:
@@ -38,7 +43,7 @@ def main():
 
         except Exception:
             logger.exception("Worker polling failed")
-            time.sleep(5)
+            time.sleep(settings.POLL_INTERVAL)
 
 
 if __name__ == "__main__":
