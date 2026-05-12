@@ -11,7 +11,8 @@ def receive_messages(max_number: int = 5):
     response = sqs.receive_message(
         QueueUrl=settings.SQS_QUEUE_URL,
         MaxNumberOfMessages=max_number,
-        WaitTimeSeconds=10
+        WaitTimeSeconds=10,
+        AttributeNames=["ApproximateReceiveCount"]
     )
 
     return response.get("Messages", [])

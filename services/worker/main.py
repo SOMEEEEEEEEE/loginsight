@@ -4,9 +4,9 @@ Current Improvements:
 - Added polling exception protection
 - Added per-message failure isolation
 - Added configurable polling interval support
+- Added SQS long polling
 
 Next Improvements:
-- Support SQS long polling
 - Add graceful shutdown handling
 """
 import time
@@ -26,7 +26,6 @@ def main():
             messages = receive_messages()
 
             if not messages:
-                time.sleep(settings.POLL_INTERVAL)
                 continue
 
             logger.info(
