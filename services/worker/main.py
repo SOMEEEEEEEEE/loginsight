@@ -5,6 +5,7 @@ Current Improvements:
 - Added per-message failure isolation
 - Added configurable polling interval support
 - Added SQS long polling
+- Added structured error logging for worker failures
 
 Next Improvements:
 - Add graceful shutdown handling
@@ -37,11 +38,22 @@ def main():
                 try:
                     handle_message(msg)
 
-                except Exception:
-                    logger.exception("Message processing failed")
+                except Exception as e:
+                    logger.exception(
+                        "Message processing failed",
+                        extra={
+                            "error": str(e),
+                            "message_id": msg.get("MessageId")
+                        }
+                    )
 
-        except Exception:
-            logger.exception("Worker polling failed")
+        except Exception as e:
+            logger.exception(
+                "Worker polling failed",
+                extra={
+                    "error": str(e)
+                }
+            )
             time.sleep(settings.POLL_INTERVAL)
 
 
