@@ -27,6 +27,7 @@ def main():
             messages = receive_messages()
 
             if not messages:
+                time.sleep(settings.POLL_INTERVAL)
                 continue
 
             logger.info(
