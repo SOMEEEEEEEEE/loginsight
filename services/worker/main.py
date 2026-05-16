@@ -17,9 +17,9 @@ from platform.config.settings import settings
 
 logger = get_logger("worker_main")
 
-
 def main():
     logger.info("Worker started")
+    backoff = settings.POLL_INTERVAL
 
     while not stop_event.is_set():
         try:
@@ -28,6 +28,8 @@ def main():
             if not messages:
                 time.sleep(settings.POLL_INTERVAL)
                 continue
+
+            backoff = settings.POLL_INTERVAL
 
             logger.info(
                 "Received messages",
@@ -56,7 +58,8 @@ def main():
                 "Worker polling failed",
                 extra={"error": str(e)}
             )
-            time.sleep(settings.POLL_INTERVAL)
+            time.sleep(backoff)
+            backoff = min(backoff * 2, settings.MAX_BACKOFF)
 
     logger.info("Worker stopped gracefully")
 
