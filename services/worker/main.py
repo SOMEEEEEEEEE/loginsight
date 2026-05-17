@@ -38,6 +38,7 @@ def main():
 
             for msg in messages:
                 if stop_event.is_set():
+                    logger.info("Shutdown requested, stopping message consumption")
                     break
 
                 try:
