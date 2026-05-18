@@ -12,6 +12,7 @@ def receive_messages(max_number: int = 5):
         QueueUrl=settings.SQS_QUEUE_URL,
         MaxNumberOfMessages=max_number,
         WaitTimeSeconds=10,
+        VisibilityTimeout=settings.SQS_VISIBILITY_TIMEOUT,
         AttributeNames=["ApproximateReceiveCount"]
     )
 
