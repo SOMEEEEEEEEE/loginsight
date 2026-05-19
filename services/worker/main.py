@@ -12,6 +12,7 @@ import time
 from worker.handler import handle_message
 from worker.shutdown import stop_event, register_signals
 from platform.aws.sqs.consumer import receive_messages
+from platform.aws.sqs.visibility import extend_message_visibility
 from platform.logging.logger import get_logger
 from platform.config.settings import settings
 
@@ -42,6 +43,11 @@ def main():
                     break
 
                 try:
+                    extend_message_visibility(
+                        msg["ReceiptHandle"],
+                        settings.SQS_VISIBILITY_TIMEOUT
+                    )
+
                     handle_message(msg)
 
                 except Exception as e:
