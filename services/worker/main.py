@@ -45,6 +45,7 @@ def main():
                 try:
                     extend_message_visibility(
                         msg["ReceiptHandle"],
+                        msg.get("MessageId"),
                         settings.SQS_VISIBILITY_TIMEOUT
                     )
 
