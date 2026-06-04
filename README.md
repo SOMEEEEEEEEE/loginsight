@@ -1,7 +1,7 @@
 #Cloud-Native LogInsight – k3s Deployment
 
 This branch is a cloud-native log ingestion system designed to run on Kubernetes (k8s).
-It demonstrates containerised services, Kubernetes deployments, and basic DevOps practices. 
+It demonstrates containerised services and basic DevOps practices. 
 
 ---
 
@@ -29,7 +29,7 @@ docker build -t loginsight-ingest ./services/ingest
 
 ### 2. Import into k8s
 ```
-sudo docker save loginsight-ingest | sudo k3s ctr images import -
+sudo docker save loginsight-ingest | sudo k8s ctr images import -
 ```
 
 ### 3. Deploy
